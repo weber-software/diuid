@@ -3,6 +3,10 @@
 mount -t proc proc /proc/
 mount -t sysfs sys /sys/
 mount -t tmpfs none /run
+mkdir /dev/pts
+mount -t devpts devpts /dev/pts
+rm /dev/ptmx
+ln -s /dev/pts/ptmx /dev/ptmx
 mkdir -p /var/lib/docker/; mount -t tmpfs none /var/lib/docker/
 
 ip link set dev lo up
