@@ -25,5 +25,8 @@ ADD linux /linux/linux
 ADD entrypoint.sh entrypoint.sh
 ADD init.sh init.sh
 
+#specify the of memory that the uml kernel can use 
+ENV MEM 2G
+
 ENTRYPOINT [ "/entrypoint.sh" ]
 CMD [ "bash" ]

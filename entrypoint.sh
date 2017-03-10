@@ -5,7 +5,7 @@
 
 #start the uml kernel with docker inside
 TMPDIR=/dev /sbin/start-stop-daemon --start --chuid `whoami` --chdir $PWD --background --make-pidfile --pidfile /tmp/kernel.pid --exec /linux/linux -- \
- rootfstype=hostfs rw quiet eth0=slirp,,/usr/bin/slirp-fullbolt mem=16G init=/init.sh
+ rootfstype=hostfs rw quiet eth0=slirp,,/usr/bin/slirp-fullbolt mem=$MEM init=/init.sh
 
 echo -n "waiting for dockerd "
 while true; do
