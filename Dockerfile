@@ -27,6 +27,7 @@ ADD init.sh init.sh
 
 #specify the of memory that the uml kernel can use 
 ENV MEM 2G
+ENV DISK 2G
 
 ENTRYPOINT [ "/entrypoint.sh" ]
 CMD [ "bash" ]

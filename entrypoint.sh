@@ -3,6 +3,10 @@
 #start sshd
 /etc/init.d/ssh start
 
+# Create the ext4 volume image
+dd if=/dev/zero of=/var/tmp/docker.img bs=1 count=0 seek=${DISK}
+mkfs.ext4 /var/tmp/docker.img
+
 #start the uml kernel with docker inside
 TMPDIR=/dev /sbin/start-stop-daemon --start --chuid `whoami` --chdir $PWD --background --make-pidfile --pidfile /tmp/kernel.pid --exec /linux/linux -- \
  rootfstype=hostfs rw quiet eth0=slirp,,/usr/bin/slirp-fullbolt mem=$MEM init=/init.sh
