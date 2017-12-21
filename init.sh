@@ -7,7 +7,12 @@ mkdir /dev/pts
 mount -t devpts devpts /dev/pts
 rm /dev/ptmx
 ln -s /dev/pts/ptmx /dev/ptmx
-mkdir -p /var/lib/docker/; mount -t tmpfs none /var/lib/docker/
+mkdir -p /var/lib/docker/
+if [[ -f /var/tmp/docker.img ]] ; then
+    mount -t ext4 /var/tmp/docker.img /var/lib/docker/
+else
+    mount -t tmpfs none /var/lib/docker/
+fi
 
 ip link set dev lo up
 ip link set dev eth0 up
