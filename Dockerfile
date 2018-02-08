@@ -1,5 +1,3 @@
-MAINTAINER weber@weber-software.com
-
 FROM debian:latest as kernel_build
 
 RUN apt-get update 
@@ -15,8 +13,9 @@ WORKDIR linux-4.8.2
 COPY KERNEL.config .config
 RUN make V=1 ARCH=um
 
-
 FROM debian:latest
+
+LABEL maintainer="weber@weber-software.com"
 
 #used to connect to the dockerd inside the uml kernel
 ENV DOCKER_HOST tcp://127.0.0.1:2375
