@@ -10,8 +10,7 @@ if [[ -n "${DISK}" ]] ; then
 fi
 
 #start the uml kernel with docker inside
-TMPDIR=/dev /sbin/start-stop-daemon --start --chuid `whoami` --chdir $PWD --background --make-pidfile --pidfile /tmp/kernel.pid --exec /linux/linux -- \
- rootfstype=hostfs rw quiet eth0=slirp,,/usr/bin/slirp-fullbolt mem=$MEM init=/init.sh
+/sbin/start-stop-daemon --start --chuid `whoami` --chdir $PWD --background --make-pidfile --pidfile /tmp/kernel.pid --exec /kernel.sh
 
 echo -n "waiting for dockerd "
 while true; do
@@ -19,6 +18,13 @@ while true; do
 		echo ""
 		break
 	fi
+	if ! /sbin/start-stop-daemon --status --pidfile /tmp/kernel.pid; then
+		echo ""
+		echo failed to start uml kernel:
+		cat /tmp/kernel.log
+		exit 1
+	fi
+
 	echo -n "."
 	sleep 0.5
 done
