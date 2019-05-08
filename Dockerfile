@@ -1,18 +1,21 @@
 FROM debian:latest as kernel_build
+ARG KERNEL_VERSION=5.2
 
 RUN \
 	apt-get update && \
-	apt-get install git fakeroot build-essential ncurses-dev xz-utils libssl-dev bc wget -y && \
+	apt-get install git fakeroot build-essential ncurses-dev xz-utils libssl-dev bc wget flex bison libelf-dev -y && \
 	apt-get install -y --no-install-recommends bsdtar
 
 RUN \
-	wget https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-4.8.2.tar.xz && \
-	tar -xf linux-4.8.2.tar.xz && \
-	rm linux-4.8.2.tar.xz
+	wget https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-$KERNEL_VERSION.tar.xz && \
+	tar -xf linux-$KERNEL_VERSION.tar.xz && \
+	rm linux-$KERNEL_VERSION.tar.xz
 
-WORKDIR linux-4.8.2
+WORKDIR linux-$KERNEL_VERSION
 COPY KERNEL.config .config
+RUN make ARCH=um oldconfig && make ARCH=um prepare
 RUN make ARCH=um
+RUN mkdir /out && cp -f linux /out/linux
 
 FROM debian:latest
 
@@ -37,7 +40,7 @@ RUN \
 	./get_docker_com.sh && \
 	rm -rf ./get_docker_com.sh
 
-COPY --from=kernel_build linux-4.8.2/linux /linux/linux
+COPY --from=kernel_build /out/linux /linux/linux
 ADD kernel.sh kernel.sh
 ADD entrypoint.sh entrypoint.sh
 ADD init.sh init.sh
