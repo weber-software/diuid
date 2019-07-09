@@ -17,9 +17,11 @@ RUN make ARCH=um oldconfig && make ARCH=um prepare
 RUN make ARCH=um -j `nproc`
 RUN mkdir /out && cp -f linux /out/linux
 
+RUN cp .config /KERNEL.config
+
 # usage: docker build -t foo --target print_config . && docker run -it --rm foo > KERNEL.config
 FROM debian:9.9 AS print_config
-COPY --from=kernel_build .config /KERNEL.CONFIG
+COPY --from=kernel_build /KERNEL.config /KERNEL.CONFIG
 CMD ["cat", "/KERNEL.CONFIG"]
 
 FROM debian:9.9
