@@ -9,6 +9,11 @@ if [[ -n "${DISK}" ]] ; then
     mkfs.ext4 /var/tmp/docker.img
 fi
 
+# verify TMPDIR configuration
+if [ $(stat --file-system --format=%T $TMPDIR) != tmpfs ]; then
+    echo "For better performance, consider mounting a tmpfs on $TMPDIR like this: \`docker run --tmpfs $TMPDIR:rw,nosuid,nodev,exec,size=8g\`"
+fi
+
 #start the uml kernel with docker inside
 /sbin/start-stop-daemon --start --background --make-pidfile --pidfile /tmp/kernel.pid --exec /bin/bash -- -c "exec /kernel.sh > /tmp/kernel.log 2>&1"
 
