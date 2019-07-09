@@ -26,7 +26,7 @@ ENV DOCKER_HOST tcp://127.0.0.1:2375
 
 RUN \
 	apt-get update && \
-	apt-get install -y wget slirp net-tools cgroupfs-mount openssh-server psmisc
+	apt-get install -y wget slirp net-tools cgroupfs-mount openssh-server psmisc rng-tools
 
 RUN \
 	mkdir /root/.ssh && \
