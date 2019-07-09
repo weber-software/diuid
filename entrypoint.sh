@@ -10,7 +10,7 @@ if [[ -n "${DISK}" ]] ; then
 fi
 
 #start the uml kernel with docker inside
-/sbin/start-stop-daemon --start --chuid `whoami` --chdir $PWD --background --make-pidfile --pidfile /tmp/kernel.pid --exec /kernel.sh
+/sbin/start-stop-daemon --start --background --make-pidfile --pidfile /tmp/kernel.pid --exec /bin/bash -- -c "exec /kernel.sh > /tmp/kernel.log 2>&1"
 
 echo -n "waiting for dockerd "
 while true; do
@@ -29,13 +29,5 @@ while true; do
 	sleep 0.5
 done
 
-#if [ $# -eq 0 ]; then
-	#/bin/bash
-#else
-	#/bin/bash -c "$@"
-#fi
-
 exec "$@"
 
-#stop the uml kernel
-/sbin/start-stop-daemon --stop --pidfile /tmp/kernel.pid
