@@ -21,9 +21,6 @@ FROM debian:latest
 
 LABEL maintainer="weber@weber-software.com"
 
-#used to connect to the dockerd inside the uml kernel
-ENV DOCKER_HOST tcp://127.0.0.1:2375
-
 RUN \
 	apt-get update && \
 	apt-get install -y wget slirp net-tools cgroupfs-mount openssh-server psmisc rng-tools
