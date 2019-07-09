@@ -1,4 +1,4 @@
-FROM debian:latest as kernel_build
+FROM debian:9.9 as kernel_build
 ARG KERNEL_VERSION=5.2
 
 RUN \
@@ -17,7 +17,7 @@ RUN make ARCH=um oldconfig && make ARCH=um prepare
 RUN make ARCH=um
 RUN mkdir /out && cp -f linux /out/linux
 
-FROM debian:latest
+FROM debian:9.9
 
 LABEL maintainer="weber@weber-software.com"
 
