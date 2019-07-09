@@ -14,7 +14,7 @@ RUN \
 WORKDIR linux-$KERNEL_VERSION
 COPY KERNEL.config .config
 RUN make ARCH=um oldconfig && make ARCH=um prepare
-RUN make ARCH=um
+RUN make ARCH=um -j `nproc`
 RUN mkdir /out && cp -f linux /out/linux
 
 # usage: docker build -t foo --target print_config . && docker run -it --rm foo > KERNEL.config
