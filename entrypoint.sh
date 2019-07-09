@@ -14,7 +14,7 @@ fi
 
 echo -n "waiting for dockerd "
 while true; do
-	if docker info 2>/dev/null >/dev/null; then
+	if docker version 2>/dev/null >/dev/null; then
 		echo ""
 		break
 	fi
