@@ -17,6 +17,8 @@ Because uml linux is using ptrace the image might need to be started with `--cap
 
 ## Example
 
-Uml linux requires a tmpfs with exec access:
+`docker run -it --rm weberlars/diuid docker info`
 
-`docker run -it --rm -e TMPDIR=/umlshm --tmpfs /umlshm:rw,nosuid,nodev,exec,size=8g weberlars/diuid docker info`
+For better performance, mount a tmpfs with exec access on `/umlshm`:
+
+`docker run -it --rm --tmpfs /umlshm:rw,nosuid,nodev,exec,size=8g weberlars/diuid docker info`

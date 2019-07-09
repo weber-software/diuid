@@ -51,7 +51,11 @@ ADD init.sh init.sh
 
 #specify the of memory that the uml kernel can use 
 ENV MEM 2G
-ENV TMPDIR /dev/shm
+ENV TMPDIR /umlshm
+
+#it is recommended to override /umlshm with
+#--tmpfs /umlshm:rw,nosuid,nodev,exec,size=8g
+VOLUME /umlshm
 
 ENTRYPOINT [ "/entrypoint.sh" ]
 CMD [ "bash" ]
