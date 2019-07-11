@@ -25,7 +25,7 @@ ifconfig eth0 10.0.2.15
 #connect to the parent docker container for reverse forwarding of the docker socket
 ssh -f -N -o StrictHostKeyChecking=no -R/var/run/docker.sock:/var/run/docker.sock 10.0.2.2
 
-PATH=/usr/bin:$PATH dockerd $DIUID_DOCKERD_FLAGS
+PATH=/usr/bin:$PATH dockerd --userland-proxy-path=$(which diuid-docker-proxy) $DIUID_DOCKERD_FLAGS
 
 ret=$?
 if [ $ret -ne 0 ]; then
