@@ -13,11 +13,7 @@ ln -s /dev/pts/ptmx /dev/ptmx
 rngd -r /dev/urandom
 
 mkdir -p /var/lib/docker/
-if [[ -f /var/tmp/docker.img ]] ; then
-    mount -t ext4 /var/tmp/docker.img /var/lib/docker/
-else
-    mount -t tmpfs none /var/lib/docker/
-fi
+mount -t ext4 /persistent/var_lib_docker.img /var/lib/docker/
 
 ip link set dev lo up
 ip link set dev eth0 up

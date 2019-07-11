@@ -1,12 +1,15 @@
 #!/bin/bash
 
+echo "Configuration: MEM=$MEM DISK=$DISK"
+
 #start sshd
 /etc/init.d/ssh start
 
-# Create the ext4 volume image if DISK is set
-if [[ -n "${DISK}" ]] ; then
-    dd if=/dev/zero of=/var/tmp/docker.img bs=1 count=0 seek=${DISK}
-    mkfs.ext4 /var/tmp/docker.img
+# Create the ext4 volume image for /var/lib/docker
+if [ ! -f /persistent/var_lib_docker.img ]; then
+    echo "Formatting /persistent/var_lib_docker.img"
+    dd if=/dev/zero of=/persistent/var_lib_docker.img bs=1 count=0 seek=${DISK} > /dev/null 2>&1
+    mkfs.ext4 /persistent/var_lib_docker.img > /dev/null 2>&1
 fi
 
 # verify TMPDIR configuration
