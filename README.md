@@ -27,11 +27,21 @@ For better performance, mount a tmpfs with exec access on `/umlshm`:
 
 To set `dockerd` flags:
 
-`docker run it --rm -e DIUID_DOCKERD_FLAGS="--experimental --debug" weberlars/diuid docker info`
+`docker run -it --rm -e DIUID_DOCKERD_FLAGS="--experimental --debug" weberlars/diuid docker info`
+
+To run as a daemon and expose the API socket to other hosts:
+
+```
+docker run -d -p 2376:2376 -v /secret:/s \
+ -e DIUID_DOCKERD_FLAGS="-H tcp://0.0.0.0:2376 --tlsverify --tlscacert /s/ca.pem --tlscert /s/cert.pem --tlskey /s/key.pem" \
+ weblars/diuid tail -f /tmp/kernel.log
+```
 
 To configure memory size and `/var/lib/docker` size:
+
 `docker run -it --rm -e MEM=4G -e DISK=20G weberlars/diuid docker info`
 
 To preserve `/var/lib/docker` disk:
+
 `docker run -it --rm -v /somewhere:/persistent weberlars/diuid docker info`
 
