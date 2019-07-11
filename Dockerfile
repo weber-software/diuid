@@ -24,6 +24,10 @@ FROM debian:9.9 AS print_config
 COPY --from=kernel_build /KERNEL.config /KERNEL.CONFIG
 CMD ["cat", "/KERNEL.CONFIG"]
 
+FROM golang:1.12 AS diuid-docker-proxy
+COPY diuid-docker-proxy /go/src/github.com/weber-software/diuid/diuid-docker-proxy
+RUN go build -o /diuid-docker-proxy /go/src/github.com/weber-software/diuid/diuid-docker-proxy
+
 FROM debian:9.9
 
 LABEL maintainer="weber@weber-software.com"
@@ -44,6 +48,11 @@ RUN \
 	./get_docker_com.sh && \
 	rm -rf ./get_docker_com.sh
 
+#install diuid-docker-proxy
+COPY --from=diuid-docker-proxy /diuid-docker-proxy /usr/bin
+RUN echo GatewayPorts=yes >> /etc/ssh/sshd_config
+
+#install kernel and scripts
 COPY --from=kernel_build /out/linux /linux/linux
 ADD kernel.sh kernel.sh
 ADD entrypoint.sh entrypoint.sh
