@@ -23,9 +23,13 @@ ifconfig eth0 10.0.2.15
 /etc/init.d/cgroupfs-mount start
 
 #connect to the parent docker container for reverse forwarding of the docker socket
-ssh -f -N -o StrictHostKeyChecking=no -R/var/run/docker.sock:/var/run/docker.sock 10.0.2.2
+ssh -f -N -o StrictHostKeyChecking=no \
+    -R/var/run/docker.sock:/var/run/docker.sock \
+    -R0.0.0.0:2375:127.0.0.1:2375 \
+    -R0.0.0.0:2376:127.0.0.1:2376 \
+    10.0.2.2
 
-PATH=/usr/bin:$PATH dockerd --userland-proxy-path=$(which diuid-docker-proxy) $DIUID_DOCKERD_FLAGS
+PATH=/usr/bin:$PATH dockerd --userland-proxy-path=$(which diuid-docker-proxy) -H unix:///var/run/docker.sock $DIUID_DOCKERD_FLAGS
 
 ret=$?
 if [ $ret -ne 0 ]; then
