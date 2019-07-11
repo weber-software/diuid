@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "Docker: $(dockerd --version)"
+echo "Kernel: $(/linux/linux --version)"
+echo "Rootfs: $(lsb_release -ds)"
+echo
 echo "Configuration: MEM=$MEM DISK=$DISK"
 
 #start sshd

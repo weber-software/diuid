@@ -1,10 +1,17 @@
-FROM debian:9.9 as kernel_build
+ARG DEBIAN_VERSION=9.9
 ARG KERNEL_VERSION=5.2
+ARG GOLANG_VERSION=1.12
+ARG DOCKER_CHANNEL=stable
+ARG DOCKER_VERSION=5:18.09.7~3-0~debian-stretch
+
+FROM debian:$DEBIAN_VERSION as kernel_build
 
 RUN \
 	apt-get update && \
 	apt-get install git fakeroot build-essential ncurses-dev xz-utils libssl-dev bc wget flex bison libelf-dev -y && \
 	apt-get install -y --no-install-recommends bsdtar
+
+ARG KERNEL_VERSION
 
 RUN \
 	wget https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-$KERNEL_VERSION.tar.xz && \
@@ -20,21 +27,22 @@ RUN mkdir /out && cp -f linux /out/linux
 RUN cp .config /KERNEL.config
 
 # usage: docker build -t foo --target print_config . && docker run -it --rm foo > KERNEL.config
-FROM debian:9.9 AS print_config
+FROM debian:$DEBIAN_VERSION AS print_config
 COPY --from=kernel_build /KERNEL.config /KERNEL.CONFIG
 CMD ["cat", "/KERNEL.CONFIG"]
 
-FROM golang:1.12 AS diuid-docker-proxy
+FROM golang:$GOLANG_VERSION AS diuid-docker-proxy
 COPY diuid-docker-proxy /go/src/github.com/weber-software/diuid/diuid-docker-proxy
 RUN go build -o /diuid-docker-proxy /go/src/github.com/weber-software/diuid/diuid-docker-proxy
 
-FROM debian:9.9
+FROM debian:$DEBIAN_VERSION
 
 LABEL maintainer="weber@weber-software.com"
 
 RUN \
 	apt-get update && \
-	apt-get install -y wget slirp net-tools cgroupfs-mount openssh-server psmisc rng-tools
+	apt-get install -y wget slirp net-tools cgroupfs-mount openssh-server psmisc rng-tools \
+	apt-transport-https ca-certificates gnupg2 software-properties-common
 
 RUN \
 	mkdir /root/.ssh && \
@@ -42,11 +50,14 @@ RUN \
 	cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys
 
 #install docker
+ARG DOCKER_CHANNEL
+ARG DOCKER_VERSION
 RUN \
-	wget https://get.docker.com/ -O ./get_docker_com.sh && \
-	chmod +x ./get_docker_com.sh && \
-	./get_docker_com.sh && \
-	rm -rf ./get_docker_com.sh
+    wget -O - https://download.docker.com/linux/debian/gpg | apt-key add - && \
+    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) $DOCKER_CHANNEL" && \
+    apt-get update && \
+    apt-cache madison docker-ce && \
+    apt-get install -y docker-ce=$DOCKER_VERSION docker-ce-cli=$DOCKER_VERSION containerd.io
 
 #install diuid-docker-proxy
 COPY --from=diuid-docker-proxy /diuid-docker-proxy /usr/bin
