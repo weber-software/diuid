@@ -22,3 +22,7 @@ Because uml linux is using ptrace the image might need to be started with `--cap
 For better performance, mount a tmpfs with exec access on `/umlshm`:
 
 `docker run -it --rm --tmpfs /umlshm:rw,nosuid,nodev,exec,size=8g weberlars/diuid docker info`
+
+To set `dockerd` flags:
+
+`docker run it --rm -e DIUID_DOCKERD_FLAGS="--experimental --debug" weberlars/diuid docker info`
