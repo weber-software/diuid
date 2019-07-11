@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/weber-software/diuid.svg?branch=master)](https://travis-ci.org/weber-software/diuid)
+
 # Docker in User Mode Linux
 
 An image for running a dockerd inside a user mode linux kernel.
