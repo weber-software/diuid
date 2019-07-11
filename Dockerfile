@@ -57,5 +57,10 @@ ENV TMPDIR /umlshm
 #--tmpfs /umlshm:rw,nosuid,nodev,exec,size=8g
 VOLUME /umlshm
 
+ENV DISK 10G
+
+#disk image for /var/lib/docker is created under this directory
+VOLUME /persistent
+
 ENTRYPOINT [ "/entrypoint.sh" ]
 CMD [ "bash" ]

@@ -28,3 +28,10 @@ For better performance, mount a tmpfs with exec access on `/umlshm`:
 To set `dockerd` flags:
 
 `docker run it --rm -e DIUID_DOCKERD_FLAGS="--experimental --debug" weberlars/diuid docker info`
+
+To configure memory size and `/var/lib/docker` size:
+`docker run -it --rm -e MEM=4G -e DISK=20G weberlars/diuid docker info`
+
+To preserve `/var/lib/docker` disk:
+`docker run -it --rm -v /somewhere:/persistent weberlars/diuid docker info`
+
