@@ -23,6 +23,20 @@ fi
 
 #start the uml kernel with docker inside
 echo "DIUID_DOCKERD_FLAGS=\"$DIUID_DOCKERD_FLAGS\"" > /tmp/env
+
+# Get docker group from DIUID_DOCKERD_FLAGS
+DIUID_DOCKERD_GROUP='docker'
+DIUID_DOCKERD_OPTS=`getopt -q -o G: --long group: -n 'getopt' -- $DIUID_DOCKERD_FLAGS`
+eval set -- "$DIUID_DOCKERD_OPTS"
+while true; do
+  case "$1" in
+	-G|--group ) DIUID_DOCKERD_GROUP="$2"; shift 2 ;;
+    -- ) shift; break ;;
+    * ) break ;;
+  esac
+done
+echo "DIUID_DOCKERD_GROUP=\"$DIUID_DOCKERD_GROUP\"" >> /tmp/env
+
 /sbin/start-stop-daemon --start --background --make-pidfile --pidfile /tmp/kernel.pid --exec /bin/bash -- -c "exec /kernel.sh > /tmp/kernel.log 2>&1"
 
 echo -n "waiting for dockerd "
