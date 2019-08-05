@@ -29,6 +29,9 @@ ssh -f -N -o StrictHostKeyChecking=no \
     -R0.0.0.0:2376:127.0.0.1:2376 \
     10.0.2.2
 
+# Change permissions to docker.sock to allow user access
+chmod 0660 /var/run/docker.sock && chown root:$DIUID_DOCKERD_GROUP /var/run/docker.sock
+
 PATH=/usr/bin:$PATH dockerd --userland-proxy-path=$(which diuid-docker-proxy) -H unix:///var/run/docker.sock $DIUID_DOCKERD_FLAGS
 
 ret=$?
