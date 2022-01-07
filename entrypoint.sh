@@ -1,4 +1,6 @@
 #!/bin/bash
+ARGS=$@
+
 echo "Docker: $(dockerd --version)"
 echo "Kernel: $(/linux/linux --version)"
 echo "Rootfs: $(lsb_release -ds)"
@@ -55,5 +57,5 @@ while true; do
 	sleep 0.5
 done
 
-exec "$@"
-
+echo "Executing \"$ARGS\""
+exec $ARGS
