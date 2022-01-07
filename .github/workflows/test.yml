@@ -1,0 +1,28 @@
+name: test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 60
+    env:
+      DOCKER_BUILDKIT: 1
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+    - name: "Print the host info"
+      run: docker info
+    - name: "Build the diuid image"
+      run: docker build -t diuid .
+    - name: "Test: Hello world"
+      run: docker run --rm diuid docker run hello-world
+    - name: "Test: nginx"
+      run: |
+        docker run -d --name diuid-nginx -p 80:80 diuid docker run -p 80:80 nginx:alpine
+        for i in {1..5}; do curl http://localhost && break || sleep 10; done
+        docker rm -f diuid-nginx
