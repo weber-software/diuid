@@ -1,5 +1,4 @@
 #!/bin/bash
-
 echo "Docker: $(dockerd --version)"
 echo "Kernel: $(/linux/linux --version)"
 echo "Rootfs: $(lsb_release -ds)"

@@ -1,15 +1,16 @@
-ARG DEBIAN_VERSION=9.9
-ARG KERNEL_VERSION=5.2
-ARG GOLANG_VERSION=1.12
+ARG DEBIAN_VERSION=11.2
+ARG KERNEL_VERSION=5.15
+ARG GOLANG_VERSION=1.17.6
 ARG DOCKER_CHANNEL=stable
-ARG DOCKER_VERSION=5:18.09.7~3-0~debian-stretch
+ARG DOCKER_VERSION=5:20.10.12~3-0~debian-bullseye
+ARG SLIRP4NETNS_VERSION=1.2.0-beta.0
 
 FROM debian:$DEBIAN_VERSION as kernel_build
 
 RUN \
 	apt-get update && \
 	apt-get install git fakeroot build-essential ncurses-dev xz-utils libssl-dev bc wget flex bison libelf-dev -y && \
-	apt-get install -y --no-install-recommends bsdtar
+	apt-get install -y --no-install-recommends libarchive-tools
 
 ARG KERNEL_VERSION
 
@@ -33,7 +34,8 @@ CMD ["cat", "/KERNEL.CONFIG"]
 
 FROM golang:$GOLANG_VERSION AS diuid-docker-proxy
 COPY diuid-docker-proxy /go/src/github.com/weber-software/diuid/diuid-docker-proxy
-RUN go build -o /diuid-docker-proxy /go/src/github.com/weber-software/diuid/diuid-docker-proxy
+WORKDIR /go/src/github.com/weber-software/diuid/diuid-docker-proxy
+RUN go build -o /diuid-docker-proxy
 
 FROM debian:$DEBIAN_VERSION
 
@@ -41,8 +43,12 @@ LABEL maintainer="weber@weber-software.com"
 
 RUN \
 	apt-get update && \
-	apt-get install -y wget slirp net-tools cgroupfs-mount openssh-server psmisc rng-tools \
-	apt-transport-https ca-certificates gnupg2 software-properties-common
+	apt-get install -y wget net-tools openssh-server psmisc rng-tools \
+	apt-transport-https ca-certificates gnupg2 software-properties-common iptables iproute2
+
+RUN \
+	update-alternatives --set iptables /usr/sbin/iptables-legacy && \
+	update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
 
 RUN \
 	mkdir /root/.ssh && \
@@ -62,6 +68,12 @@ RUN \
 #install diuid-docker-proxy
 COPY --from=diuid-docker-proxy /diuid-docker-proxy /usr/bin
 RUN echo GatewayPorts=yes >> /etc/ssh/sshd_config
+
+#install slirp4netns (used by UML)
+ARG SLIRP4NETNS_VERSION
+RUN \
+  wget -O /usr/bin/slirp4netns https://github.com/rootless-containers/slirp4netns/releases/download/v${SLIRP4NETNS_VERSION}/slirp4netns-x86_64 && \
+  chmod +x /usr/bin/slirp4netns
 
 #install kernel and scripts
 COPY --from=kernel_build /out/linux /linux/linux
