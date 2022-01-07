@@ -1,9 +1,21 @@
 #!/bin/bash
-set -xu
+set -xue -o pipefail
 source /tmp/env
 
 mount -t proc proc /proc/
 mount -t sysfs sys /sys/
+
+# Initialize cgroup2 mount
+mount -t cgroup2 none /sys/fs/cgroup
+# Evacuate the current process to "init.tmp" group so that we can configure subtree_control
+mkdir /sys/fs/cgroup/init.tmp
+echo $$ >/sys/fs/cgroup/init.tmp/cgroup.procs
+cat /sys/fs/cgroup/cgroup.controllers
+echo '+cpu +io +memory +pids' >/sys/fs/cgroup/cgroup.subtree_control
+# Restore the "init.tmp" group to the top-level group
+echo $$ >/sys/fs/cgroup/cgroup.procs
+rmdir /sys/fs/cgroup/init.tmp
+
 mount -t tmpfs none /run
 mkdir /dev/pts
 mount -t devpts devpts /dev/pts
@@ -16,11 +28,9 @@ mkdir -p /var/lib/docker/
 mount -t ext4 /persistent/var_lib_docker.img /var/lib/docker/
 
 ip link set dev lo up
-ip link set dev eth0 up
-route add default dev eth0
-ifconfig eth0 10.0.2.15
-
-/etc/init.d/cgroupfs-mount start
+ip link set dev vec0 up
+ip addr add 10.0.2.100/24 dev vec0
+ip route add default via 10.0.2.2
 
 #connect to the parent docker container for reverse forwarding of the docker socket
 ssh -f -N -o StrictHostKeyChecking=no \
